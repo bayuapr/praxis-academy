@@ -1,0 +1,1572 @@
+1. bitsadmin
+C:\Users\ASUS>bitsadmin
+
+BITSADMIN version 3.0
+BITS administration utility.
+(C) Copyright Microsoft Corp.
+
+USAGE: BITSADMIN [/RAWRETURN] [/WRAP | /NOWRAP] command
+The following commands are available:
+
+/HELP           Prints this help
+/?              Prints this help
+/UTIL /?        Prints the list of utilities commands
+/PEERCACHING /?   Prints the list of commands to manage Peercaching
+/CACHE /?       Prints the list of cache management commands
+/PEERS /?       Prints the list of peer management commands
+
+/LIST    [/ALLUSERS] [/VERBOSE]     List the jobs
+/MONITOR [/ALLUSERS] [/REFRESH sec] Monitors the copy manager
+/RESET   [/ALLUSERS]                Deletes all jobs in the manager
+
+/TRANSFER <job name> [type] [/PRIORITY priority] [/ACLFLAGS flags] [/DYNAMIC]
+          remote_url local_name
+    Transfers one of more files.
+    [type] may be /DOWNLOAD or /UPLOAD; default is download
+    Multiple URL/file pairs may be specified.
+    Unlike most commands, <job name> may only be a name and not a GUID.
+    /DYNAMIC configures the job with BITS_JOB_PROPERTY_DYNAMIC_CONTENT, which relaxes the server-side requirements.
+
+/CREATE [type] <job name>               Creates a job
+    [type] may be /DOWNLOAD, /UPLOAD, or /UPLOAD-REPLY; default is download
+    Unlike most commands, <job name> may only be a name and not a GUID.
+
+/INFO <job> [/VERBOSE]                   Displays information about the job
+/ADDFILE <job> <remote_url> <local_name> Adds a file to the job
+/ADDFILESET <job> <textfile>             Adds multiple files to the job
+   Each line of <textfile> lists a file's remote name and local name, separated
+   by spaces.  A line beginning with '#' is treated as a comment.
+   Once the file set is read into memory, the contents are added to the job.
+
+/ADDFILEWITHRANGES  <job> <remote_url> <local_name range_list>
+   Like /ADDFILE, but BITS will read only selected byte ranges of the URL.
+   range_list is a comma-delimited series of offset and length pairs.
+   For example,
+
+       0:100,2000:100,5000:eof
+
+   instructs BITS to read 100 bytes starting at offset zero, 100 bytes starting
+   at offset 2000, and the remainder of the URL starting at offset 5000.
+
+/REPLACEREMOTEPREFIX <job> <old_prefix> <new_prefix>
+    All files whose URL begins with <old_prefix> are changed to use <new_prefix>
+
+Note that BITS currently supports HTTP/HTTPS downloads and uploads.
+It also supports UNC paths and file:// paths as URLS
+
+/LISTFILES <job>                     Lists the files in the job
+/SUSPEND <job>                       Suspends the job
+/RESUME <job>                        Resumes the job
+/CANCEL <job>                        Cancels the job
+/COMPLETE <job>                      Completes the job
+
+/GETTYPE <job>                       Retrieves the job type
+/GETACLFLAGS <job>                   Retrieves the ACL propagation flags
+
+/SETACLFLAGS <job> <ACL_flags>       Sets the ACL propagation flags for the job
+  O - OWNER       G - GROUP
+  D - DACL        S - SACL
+
+  Examples:
+      bitsadmin /setaclflags MyJob OGDS
+      bitsadmin /setaclflags MyJob OGD
+
+/GETBYTESTOTAL <job>                 Retrieves the size of the job
+/GETBYTESTRANSFERRED <job>           Retrieves the number of bytes transferred
+/GETFILESTOTAL <job>                 Retrieves the number of files in the job
+/GETFILESTRANSFERRED <job>           Retrieves the number of files transferred
+/GETCREATIONTIME <job>               Retrieves the job creation time
+/GETMODIFICATIONTIME <job>           Retrieves the job modification time
+/GETCOMPLETIONTIME <job>             Retrieves the job completion time
+/GETSTATE <job>                      Retrieves the job state
+/GETERROR <job>                      Retrieves detailed error information
+/GETOWNER <job>                      Retrieves the job owner
+/GETDISPLAYNAME <job>                Retrieves the job display name
+/SETDISPLAYNAME <job> <display_name> Sets the job display name
+/GETDESCRIPTION <job>                Retrieves the job description
+/SETDESCRIPTION <job> <description>  Sets the job description
+/GETPRIORITY    <job>                Retrieves the job priority
+/SETPRIORITY    <job> <priority>     Sets the job priority
+   Priority usage choices:
+      FOREGROUND
+      HIGH
+      NORMAL
+      LOW
+/GETNOTIFYFLAGS <job>                 Retrieves the notify flags
+/SETNOTIFYFLAGS <job> <notify_flags>  Sets the notify flags
+    For more help on this option, please refer to the MSDN help page for SetNotifyFlags/GETNOTIFYINTERFACE <job>             Determines if notify interface is registered
+/GETMINRETRYDELAY <job>               Retrieves the retry delay in seconds
+/SETMINRETRYDELAY <job> <retry_delay> Sets the retry delay in seconds
+/GETNOPROGRESSTIMEOUT <job>           Retrieves the no progress timeout in seconds
+/SETNOPROGRESSTIMEOUT <job> <timeout> Sets the no progress timeout in seconds
+/GETMAXDOWNLOADTIME <job>             Retrieves the download timeout in seconds
+/SETMAXDOWNLOADTIME <job> <timeout>   Sets the download timeout in seconds
+/GETERRORCOUNT <job>                  Retrieves an error count for the job
+
+/SETPROXYSETTINGS <job> <usage>      Sets the proxy usage
+   usage choices:
+    PRECONFIG   - Use the owner's default Internet settings.
+    AUTODETECT  - Force autodetection of proxy.
+    NO_PROXY    - Do not use a proxy server.
+    OVERRIDE    - Use an explicit proxy list and bypass list.
+                  Must be followed by a proxy list and a proxy bypass list.
+                  NULL or "" may be used for an empty proxy bypass list.
+  Examples:
+      bitsadmin /setproxysettings MyJob PRECONFIG
+      bitsadmin /setproxysettings MyJob AUTODETECT
+      bitsadmin /setproxysettings MyJob NO_PROXY
+      bitsadmin /setproxysettings MyJob OVERRIDE proxy1:80 "<local>"
+      bitsadmin /setproxysettings MyJob OVERRIDE proxy1,proxy2,proxy3 NULL
+
+/GETPROXYUSAGE <job>                 Retrieves the proxy usage setting
+/GETPROXYLIST <job>                  Retrieves the proxy list
+/GETPROXYBYPASSLIST <job>            Retrieves the proxy bypass list
+
+/TAKEOWNERSHIP <job>                 Take ownership of the job
+
+/SETNOTIFYCMDLINE <job> <program_name> [program_parameters]
+    Sets a program to execute for notification, and optionally parameters.
+    The program name and parameters can be NULL.
+    IMPORTANT: if parameters are non-NULL, then the program name should be the
+               first parameter.
+
+  Examples:
+    bitsadmin /SetNotifyCmdLine MyJob c:\winnt\system32\notepad.exe  NULL
+    bitsadmin /SetNotifyCmdLine MyJob c:\callback.exe "c:\callback.exe parm1 parm2"
+    bitsadmin /SetNotifyCmdLine MyJob NULL NULL
+
+/GETNOTIFYCMDLINE <job>              Returns the job's notification command line
+
+/SETCREDENTIALS <job> <target> <scheme> <username> <password>
+  Adds credentials to a job.
+  <target> may be either SERVER or PROXY
+  <scheme> may be BASIC, DIGEST, NTLM, NEGOTIATE, or PASSPORT.
+
+/REMOVECREDENTIALS <job> <target> <scheme>
+  Removes credentials from a job.
+/GETCUSTOMHEADERS <job>                           Gets the Custom HTTP Headers
+/SETCUSTOMHEADERS <job> <header1> <header2> <...> Sets the Custom HTTP Headers
+/MAKECUSTOMHEADERSWRITEONLY <job>                 Make a job's Custom HTTP Headers write-only (cannot be undone).
+
+/GETHTTPMETHOD <job>                           Gets the HTTP verb to use.
+/SETHTTPMETHOD <job> <HTTPMethod>              Sets the HTTP verb to use.
+
+/GETCLIENTCERTIFICATE <job>                       Gets the job's Client Certificate Information
+/SETCLIENTCERTIFICATEBYID <job> <store_location> <store_name> <hexa-decimal_cert_id>
+  Sets a client authentication certificate to a job.
+  <store_location> may be
+        1(CURRENT_USER), 2(LOCAL_MACHINE), 3(CURRENT_SERVICE),
+        4(SERVICES), 5(USERS), 6(CURRENT_USER_GROUP_POLICY),
+        7(LOCAL_MACHINE_GROUP_POLICY) or 8(LOCAL_MACHINE_ENTERPRISE).
+
+/SETCLIENTCERTIFICATEBYNAME <job> <store_location> <store_name> <subject_name>
+  Sets a client authentication certificate to a job.
+  <store_location> may be
+        1(CURRENT_USER), 2(LOCAL_MACHINE), 3(CURRENT_SERVICE),
+        4(SERVICES), 5(USERS), 6(CURRENT_USER_GROUP_POLICY),
+        7(LOCAL_MACHINE_GROUP_POLICY) or 8(LOCAL_MACHINE_ENTERPRISE).
+
+/REMOVECLIENTCERTIFICATE <job>                Removes the Client Certificate Information from the job
+
+/SETSECURITYFLAGS <job> <value>
+   Sets the HTTP security flags for URL redirection and checks performed on the server certificate during the transfer.
+   The value is an unsigned integer with the following interpretation for the bits in the binary representation.
+     Enable CRL Check                                 : Set the least significant bit
+     Ignore invalid common name in server certificate : Set the 2nd bit from right
+     Ignore invalid date in  server certificate       : Set the 3rd bit from right
+     Ignore invalid certificate authority in server
+       certificate                                    : Set the 4th bit from right
+     Ignore invalid usage of certificate              : Set the 5th bit from right
+     Redirection policy                               : Controlled by the 9th-11th bits from right
+         0,0,0  - Redirects will be automatically allowed.
+         0,0,1  - Remote name in the IBackgroundCopyFile interface will be updated if a redirect occurs.
+         0,1,0  - BITS will fail the job if a redirect occurs.
+
+     Allow redirection from HTTPS to HTTP             : Set the 12th bit from right
+
+/GETSECURITYFLAGS <job>
+   Reports the HTTP security flags for URL redirection and checks performed on the server certificate during the transfer.
+
+/SETVALIDATIONSTATE  <job>  <file-index> <true|false>
+      <file-index> starts from 0
+    Sets the content-validation state of the given file within the job.
+
+/GETVALIDATIONSTATE  <job>  <file-index>
+      <file-index> starts from 0
+    Reports the content-validation state of the given file within the job.
+
+/GETTEMPORARYNAME  <job>  <file-index>
+      <file-index> starts from 0
+    Reports the temporary filename of the given file within the job.
+
+The following options control peercaching of a particular job:
+
+/SETPEERCACHINGFLAGS  <job> <value>
+    Sets the flags for the job's peercaching behavior.
+    The value is an unsigned integer with the following interpretation for the bits in the binary representation.
+        Allow the job's data to be downloaded from a peer : Set the least significant bit
+        Allow the job's data to be served to peers        : Set the 2nd bit from right
+
+/GETPEERCACHINGFLAGS  <job>
+    Reports the flags for the job's peercaching behavior.
+
+The following options are valid for UPLOAD-REPLY jobs only:
+
+/GETREPLYFILENAME <job>        Gets the path of the file containing the server reply
+/SETREPLYFILENAME <job> <path> Sets the path of the file containing the server reply
+/GETREPLYPROGRESS <job>        Gets the size and progress of the server reply
+/GETREPLYDATA     <job>        Dumps the server's reply data in hex format
+
+/SETHELPERTOKEN <job>          Sets the current command prompt's primary token as a job's helper token
+/GETHELPERTOKENSID <job>       Reports the user account SID of a job's helper token, if one is set
+
+/SETHELPERTOKENFLAGS <job> <flags>
+    Sets the helper token usage flags for a job. Possible values are:
+        1 - The helper token is used when accessing the local filesystem.
+        2 - The helper token is used when accessing the network.
+        3 - The helper token is used when accessing both the local filesystem and the network.
+
+/GETHELPERTOKENFLAGS <job>
+    Reports a job's helper token usage flags.
+
+/GETPEERSTATS <job> <file-index>
+    <file-index> starts from 0
+    Reports statistics about the amount of data downloaded from peers and origin servers for a specific file within a job.
+
+The following options can be placed before the command:
+/RAWRETURN                     Return data more suitable for parsing
+/WRAP                          Wrap output around console (default)
+/NOWRAP                        Don't wrap output around console
+
+The /RAWRETURN option strips new line characters and formatting.
+It is recognized by the /CREATE and /GET* commands.
+
+Commands that take a <job> parameter will accept either a job name or a job ID
+GUID inside braces.  BITSADMIN reports an error if a name is ambiguous.
+
+2. ping
+C:\Users\ASUS>ping /a 10.202.210.182
+
+Pinging LAPTOP-U9I6D586 [10.202.210.182] with 32 bytes of data:
+Reply from 10.202.210.182: bytes=32 time<1ms TTL=128
+Reply from 10.202.210.182: bytes=32 time<1ms TTL=128
+Reply from 10.202.210.182: bytes=32 time<1ms TTL=128
+Reply from 10.202.210.182: bytes=32 time<1ms TTL=128
+
+Ping statistics for 10.202.210.182:
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss),
+Approximate round trip times in milli-seconds:
+    Minimum = 0ms, Maximum = 0ms, Average = 0ms
+
+3. arp 
+C:\Users\ASUS>arp /a
+
+Interface: 192.168.56.1 --- 0x4
+  Internet Address      Physical Address      Type
+  192.168.56.255        ff-ff-ff-ff-ff-ff     static
+  224.0.0.22            01-00-5e-00-00-16     static
+  224.0.0.251           01-00-5e-00-00-fb     static
+  224.0.0.252           01-00-5e-00-00-fc     static
+  239.255.255.250       01-00-5e-7f-ff-fa     static
+
+Interface: 10.202.210.182 --- 0xc
+  Internet Address      Physical Address      Type
+  10.202.0.1            00-30-88-18-2a-b3     dynamic
+  10.202.255.255        ff-ff-ff-ff-ff-ff     static
+  224.0.0.22            01-00-5e-00-00-16     static
+  224.0.0.251           01-00-5e-00-00-fb     static
+  224.0.0.252           01-00-5e-00-00-fc     static
+  255.255.255.255       ff-ff-ff-ff-ff-ff     static
+
+4. assosc .txt
+C:\Users\ASUS>assoc .txt
+.txt=txtfile
+
+5. assooc | more
+C:\Users\ASUS>assoc | more
+.001=WinRAR
+.386=vxdfile
+.3g2=WMP11.AssocFile.3G2
+.3gp=WMP11.AssocFile.3GP
+.3gp2=WMP11.AssocFile.3G2
+.3gpp=WMP11.AssocFile.3GP
+.7z=WinRAR
+.AAC=WMP11.AssocFile.ADTS
+.accda=Access.ACCDAExtension.16
+.accdb=Access.Application.16
+.accdc=Access.ACCDCFile.16
+.accde=Access.ACCDEFile.16
+.accdr=Access.ACCDRFile.16
+.accdt=Access.ACCDTFile.16
+.accdu=Access.WizardUserDataFile.16
+.accdw=Access.WebApplicationReference.16
+.accft=Access.ACCFTFile.16
+.accountpicture-ms=accountpicturefile
+.ace=WinRAR
+.acl=ACLFile
+.AddIn=VisualStudio.AddIn.10.0
+.ade=Access.ADEFile.16
+.adn=Access.BlankProjectTemplate.16
+.adp=Access.Project.16
+.ADT=WMP11.AssocFile.ADTS
+.ADTS=WMP11.AssocFile.ADTS
+.aif=GOMPlayer.aif
+.aifc=WMP11.AssocFile.AIFF
+.aiff=GOMPlayer.aiff
+.alac=GOMPlayer.alac
+.amr=GOMPlayer.amr
+.amv=GOMPlayer.amv
+.ani=anifile
+.ape=GOMPlayer.ape
+.apk=BlueStacks.Apk
+.appcontent-ms=ApplicationContent
+.application=Application.Manifest
+.appref-ms=Application.Reference
+.arj=WinRAR
+.asa=aspfile
+.asax=VisualStudio.asax.10.0
+.ascx=VisualStudio.ascx.10.0
+.asf=WMP11.AssocFile.ASF
+.ashx=VisualStudio.ashx.10.0
+.asmx=VisualStudio.asmx.10.0
+.asp=aspfile
+.aspx=VisualStudio.aspx.10.0
+.ass=GOMPlayer.ass
+.asx=GOMPlayer.asx
+.au=WMP11.AssocFile.AU
+.avi=WMP11.AssocFile.AVI
+.aw=AWFile
+.bat=batfile
+.bcp=SqlServerReplication.Bcp
+.blg=Diagnostic.Perfmon.Document
+.bmp=Paint.Picture
+.bpg=BorlandProjectGroup
+.bz=WinRAR
+.bz2=WinRAR
+.caf=GOMPlayer.caf
+.camp=campfile
+.cat=CATFile
+.cda=WMP11.AssocFile.CDA
+.cdmp=cdmpfile
+.cdx=aspfile
+.cdxml=Microsoft.PowerShellCmdletDefinitionXML.1
+.cer=CERFile
+.chk=chkfile
+.chm=chm.file
+.cmd=cmdfile
+.com=comfile
+.compositefont=Windows.CompositeFont
+.config=VisualStudio.config.10.0
+.cpl=cplfile
+.crl=CRLFile
+.crt=CERFile
+.crtx=CRTXFile
+.cshtml=VisualStudio.cshtml.10.0
+.css=CSSfile
+.csv=Excel.CSV
+.cur=VisualStudio.cur.10.0
+.dacpac=ssms.dacpac.12.0
+.datasource=VisualStudio.datasource.10.0
+.db=dbfile
+.dctx=IMEDictionaryCompiler
+.dctxc=IMEDictionaryCompiler
+.dcu=DelphiCompiledUnit
+.dds=ddsfile
+.der=CERFile
+.desklink=CLSID\{9E56BE61-C50F-11CF-9A2C-00A0C90A90CE}
+.deskthemepack=desktopthemepackfile
+.det=Outlook.File.det.15
+.dff=GOMPlayer.dff
+.dfm=DelphiForm
+.diagcab=Diagnostic.Cabinet
+.diagcfg=Diagnostic.Config
+.diagpkg=Diagnostic.Document
+.dib=Paint.Picture
+.disco=VisualStudio.disco.10.0
+.divx=GOMPlayer.divx
+.dll=dllfile
+.dmb=GOMPlayer.dmb
+.dmp=VisualStudio.dmp.10.0
+.dmskm=GOMPlayer.dmskm
+.dmx=ssms.dmx.12.0
+.doc=Word.Document.8
+.dochtml=wordhtmlfile
+.docm=Word.DocumentMacroEnabled.12
+.docmhtml=wordmhtmlfile
+.docx=Word.Document.12
+.docxml=wordxmlfile
+.dot=Word.Template.8
+.dothtml=wordhtmltemplate
+.dotm=Word.TemplateMacroEnabled.12
+.dotx=Word.Template.12
+.dpk=DelphiPackage
+.dpr=DelphiProject
+.dqy=dqyfile
+.dri=SqlServerReplication.Dri
+.drv=drvfile
+.dsf=GOMPlayer.dsf
+.dsn=MSDASQL
+.dss=GOMPlayer.dss
+.dtd=VisualStudio.dtd.10.0
+.dtsConfig=IntegrationServices.Configuration.120
+.dtsx=IntegrationServices.Package.120
+.duk=GOMPlayer.duk
+.dvd=GOMPlayer.dvd
+.dvr-ms=GOMPlayer.dvr-ms
+.elm=ELMFile
+.emf=emffile
+.eml=Outlook.File.eml.15
+.ep=Pencil Document
+.epgz=Pencil Document
+.epz=Pencil Document
+.evo=GOMPlayer.evo
+.evt=evtfile
+.evtx=evtxfile
+.exe=exefile
+.fdm=Outlook.File.fdm.15
+.flac=WMP11.AssocFile.FLAC
+.flv=GOMPlayer.flv
+.fon=fonfile
+.ftx=SqlServerReplication.Ftx
+.gbm=GOMPlayer.gbm
+.gcsx=GCSXFile
+.gif=giffile
+.glox=GLOXFile
+.gmmp=gmmpfile
+.gom=GOMPlayer.gom
+.gps=Gomplayer.Skinfile
+.gqsx=GQSXFile
+.gra=MSGraph.Chart.8
+.grp=MSProgramGroup
+.gsm=GOMPlayer.gsm
+.gxf=GOMPlayer.gxf
+.gz=WinRAR
+.h264=GOMPlayer.h264
+.hdd=progId_VirtualBox.Shell.hdd
+.hdmp=VisualStudio.hdmp.10.0
+.hlp=hlpfile
+.hol=Outlook.File.hol.15
+.hta=htafile
+.htm=htmlfile
+.html=htmlfile
+.hxa=MSHelp.hxa.2.5
+.hxc=MSHelp.hxc.2.5
+.hxd=MSHelp.hxd.2.5
+.hxe=MSHelp.hxe.2.5
+.hxf=MSHelp.hxf.2.5
+.hxh=MSHelp.hxh.2.5
+.hxi=MSHelp.hxi.2.5
+.hxk=MSHelp.hxk.2.5
+.hxq=MSHelp.hxq.2.5
+.hxr=MSHelp.hxr.2.5
+.rct=VisualStudio.rct.10.0
+.rdlc=VisualStudio.rdlc.10.0
+.RDP=RDP.File
+.reg=regfile
+.rels=xmlfile
+.res=VisualStudio.res.10.0
+.resmoncfg=Diagnostic.Resmon.Config
+.resx=VisualStudio.resx.10.0
+.rev=WinRAR.REV
+.rle=rlefile
+.rll=dllfile
+.rm=GOMPlayer.rm
+.rmi=WMP11.AssocFile.MIDI
+.rmvb=GOMPlayer.rmvb
+.rqy=rqyfile
+.rso=GOMPlayer.rso
+.rt=GOMPlayer.rt
+.rtf=Word.RTF.8
+.sbv=GOMPlayer.sbv
+.scf=SHCmdFile
+.sch=SqlServerReplication.Sch
+.scp=txtfile
+.scr=scrfile
+.sct=scriptletfile
+.sdl=VisualStudio.sdl.10.0
+.search-ms=SearchFolder
+.searchConnector-ms=SearchConnectorFolder
+.settingcontent-ms=SettingContent
+.settings=VisualStudio.settings.10.0
+.shn=GOMPlayer.shn
+.shtml=shtmlfile
+.sitemap=VisualStudio.sitemap.10.0
+.skin=VisualStudio.skin.10.0
+.skm=GOMPlayer.skm
+.sldm=PowerPoint.SlideMacroEnabled.12
+.sldx=PowerPoint.Slide.12
+.slk=Excel.SLK
+.sln=VisualStudio.Launcher.sln
+.smi=GOMPlayer.smi
+.smil=GOMPlayer.smil
+.snd=WMP11.AssocFile.AU
+.snippet=VisualStudio.snippet.10.0
+.snk=VisualStudio.snk.10.0
+.spc=SPCFile
+.spl=ShockwaveFlash.ShockwaveFlash
+.spx=GOMPlayer.spx
+.sql=ssms.sql.12.0
+.SQLPlan=ssms.SQLPlan.12.0
+.srt=GOMPlayer.srt
+.ssa=GOMPlayer.ssa
+.SSISDeploymentManifest=IntegrationServices.DeploymentManifest.120
+.ssmsasproj=ssms.ssmsasproj.12.0
+.ssmssln=ssms.ssmssln.12.0
+.ssmssqlproj=ssms.ssmssqlproj.12.0
+.sst=CertificateStoreFile
+.sub=GOMPlayer.sub
+.suo=VisualStudio.Launcher.suo
+.sup=GOMPlayer.sup
+.svc=VisualStudio.svc.10.0
+.svg=svgfile
+.svi=GOMPlayer.svi
+.swf=GOMPlayer.swf
+.symlink=.symlink
+.sync=VisualStudio.Sync.10.0
+.sys=sysfile
+.tak=GOMPlayer.tak
+.tar=WinRAR
+.taz=WinRAR
+.tbz=WinRAR
+.tbz2=WinRAR
+.tdf=SQLServerProfilerTraceDef
+.tgz=WinRAR
+.theme=themefile
+.themepack=themepackfile
+.thmx=OfficeTheme.12
+.tif=TIFImage.Document
+.tiff=TIFImage.Document
+.tlz=WinRAR
+.tp=GOMPlayer.tp
+.trc=SQLServerProfilerTraceData
+.trg=SqlServerReplication.Trg
+.trn=SqlServerLogShipping.Trn
+.TS=GOMPlayer.ts
+.tsql=ssms.tsql.12.0
+.tt=VisualStudio.TextTemplating.10.0
+.tta=GOMPlayer.tta
+.ttc=ttcfile
+.ttf=ttffile
+.TTS=WMP11.AssocFile.TTS
+.txt=txtfile
+.txz=WinRAR
+.UDL=MSDASC
+.URL=InternetShortcut
+.uu=WinRAR
+.uue=WinRAR
+.uxdc=UXDCFILE
+.VBE=VBEFile
+.vbhtml=VisualStudio.vbhtml.10.0
+.vbox=progId_VirtualBox.Shell.vbox
+.vbox-extpack=progId_VirtualBox.Shell.vbox-extpack
+.vbs=VBSFile
+.vcf=Outlook.File.vcf.15
+.vcs=Outlook.File.vcs.15
+.vdi=progId_VirtualBox.Shell.vdi
+.vdr=GOMPlayer.vdr
+.vdw=VisioViewer.Viewer
+.vdx=VisioViewer.Viewer
+.vhd=progId_VirtualBox.Shell.vhd
+.vhdpmem=Windows.VhdPmemFile
+.vhdx=Windows.VhdFile
+.vmdk=progId_VirtualBox.Shell.vmdk
+.vob=GOMPlayer.vob
+.vp6=GOMPlayer.vp6
+.vp7=GOMPlayer.vp7
+.vpp=Visual Paradigm
+.vscontent=VisualStudio.ContentInstaller.vscontent
+.vsct=VisualStudio.vsct.10.0
+.vsd=VisioViewer.Viewer
+.vsdm=VisioViewer.Viewer
+.vsdx=VisioViewer.Viewer
+.vsi=VisualStudio.ContentInstaller.vsi
+.vsix=VisualStudio.Launcher.vsix
+.vsixlangpack=VisualStudio.vsixlangpack.10.0
+.vsixmanifest=VisualStudio.vsixmanifest.10.0
+.vspscc=VisualStudio.vspscc.10.0
+.vss=VisioViewer.Viewer
+.vsscc=VisualStudio.vsscc.10.0
+.vssettings=VisualStudio.vssettings.10.0
+.vssm=VisioViewer.Viewer
+.vssscc=VisualStudio.vssscc.10.0
+.vssx=VisioViewer.Viewer
+.vst=VisioViewer.Viewer
+.vstemplate=VisualStudio.vstemplate.10.0
+.vstm=VisioViewer.Viewer
+.vsto=bootstrap.vsto.1
+.vstx=VisioViewer.Viewer
+.vsx=VisioViewer.Viewer
+.vtt=GOMPlayer.vtt
+.vtx=VisioViewer.Viewer
+.vxd=vxdfile
+.wab=wab_auto_file
+.wav=WMP11.AssocFile.WAV
+.wax=WMP11.AssocFile.WAX
+.wbcat=wbcatfile
+.wbk=Word.Backup.8
+.wcx=wcxfile
+.wdp=wdpfile
+.webm=GOMPlayer.webm
+.webpnp=webpnpFile
+.website=Microsoft.Website
+.wiz=Word.Wizard.8
+.wizhtml=accessthmltemplate
+.wll=Word.Addin.8
+.wm=WMP11.AssocFile.ASF
+.wma=WMP11.AssocFile.WMA
+.WMD=WMP11.AssocFile.WMD
+.wmdb=WMP.WMDBFile
+.wmf=wmffile
+.wmp=GOMPlayer.wmp
+.WMS=WMP11.AssocFile.WMS
+.wmv=WMP11.AssocFile.WMV
+.wmx=GOMPlayer.wmx
+.wmz=WMP11.AssocFile.WMZ
+.wpl=WMP11.AssocFile.WPL
+.wrk=SqlServerLogShipping.Wrk
+.wsc=scriptletfile
+.wsdl=VisualStudio.wsdl.10.0
+.WSF=WSFFile
+.WSH=WSHFile
+.wtx=txtfile
+.wv=GOMPlayer.wv
+.wvx=GOMPlayer.wvx
+.xaml=Windows.XamlDocument
+.xapk=BlueStacks.Xapk
+.xbap=Windows.Xbap
+.xdl=ssms.xdl.12.0
+.xdr=VisualStudio.xdr.10.0
+.xel=ssms.xel.12.0
+.xevgenxml=XEV.GenericApp
+.xfm=DelphiCLXForm
+.xht=xhtmlfile
+.xhtml=xhtmlfile
+.xla=Excel.Addin
+.xlam=Excel.AddInMacroEnabled
+.xld=Excel.Dialog
+.xlk=Excel.Backup
+.xll=Excel.XLL
+.xlm=Excel.Macrosheet
+.xls=Excel.Sheet.8
+.xlsb=Excel.SheetBinaryMacroEnabled.12
+.xlshtml=Excelhtmlfile
+.xlsm=Excel.SheetMacroEnabled.12
+.xlsmhtml=excelmhtmlfile
+.xlsx=Excel.Sheet.12
+.xlt=Excel.Template.8
+.xlthtml=Excelhtmltemplate
+.xltm=Excel.TemplateMacroEnabled
+.xltx=Excel.Template
+.xlw=Excel.Workspace
+.xlxml=Excelxmlss
+.xml=xmlfile
+.xmla=ssms.xmla.12.0
+.xpp=SqlServerReplication.Xpp
+.xrm-ms=MSSppLicenseFile
+.xsc=VisualStudio.xsc.10.0
+.xsd=VisualStudio.xsd.10.0
+.xsl=VisualStudio.xsl.10.0
+.xslt=VisualStudio.xslt.10.0
+.xss=VisualStudio.xss.10.0
+.xxe=WinRAR
+.xz=WinRAR
+.z=WinRAR
+.ZFSendToTarget=CLSID\{888DCA60-FC0A-11CF-8F0F-00C04FD7D062}
+.zip=WinRAR.ZIP
+.zipx=WinRAR
+._sln=VisualStudio.Launcher._sln
+._sln100=VisualStudio.Launcher._sln100
+._sln60=VisualStudio.Launcher._sln60
+._sln70=VisualStudio.Launcher._sln70
+._sln71=VisualStudio.Launcher._sln71
+._sln80=VisualStudio.Launcher._sln80
+._sln90=VisualStudio.Launcher._sln90
+._vbxsln100=VisualStudio.Launcher._vbxsln100
+._vbxsln80=VisualStudio.Launcher._vbxsln80
+._vbxsln90=VisualStudio.Launcher._vbxsln90
+._vcppxsln100=VisualStudio.Launcher._vcppxsln100
+._vcppxsln80=VisualStudio.Launcher._vcppxsln80
+._vcppxsln90=VisualStudio.Launcher._vcppxsln90
+._vcsxsln100=VisualStudio.Launcher._vcsxsln100
+._vcsxsln80=VisualStudio.Launcher._vcsxsln80
+._vcsxsln90=VisualStudio.Launcher._vcsxsln90
+._vjsxsln80=VisualStudio.Launcher._vjsxsln80
+._vpdxsln100=VisualStudio.Launcher._vpdxsln100
+._vwdxsln100=VisualStudio.Launcher._vwdxsln100
+._vwdxsln80=VisualStudio.Launcher._vwdxsln80
+._vwdxsln90=VisualStudio.Launcher._vwdxsln90
+
+6. schtasks.exe
+C:\Users\ASUS>schtasks.exe
+
+Folder: \
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+AdobeGCInvoker-1.0                       15/08/2020 15.39.00    Ready
+ASUS Display Control                     N/A                    Running
+ASUS Power Scheme Service                N/A                    Running
+CreateExplorerShellUnelevatedTask        N/A                    Ready
+NvBatteryBoostCheckOnLogon_{B2FE1952-018 N/A                    Ready
+NvDriverUpdateCheckDaily_{B2FE1952-0186- 15/08/2020 12.25.35    Ready
+NVIDIA GeForce Experience SelfUpdate_{B2 N/A                    Ready
+NvNodeLauncher_{B2FE1952-0186-46C3-BAEC- N/A                    Ready
+NvProfileUpdaterDaily_{B2FE1952-0186-46C 15/08/2020 12.25.32    Ready
+NvProfileUpdaterOnLogon_{B2FE1952-0186-4 N/A                    Ready
+NvTmMon_{B2FE1952-0186-46C3-BAEC-A80AA35 N/A                    Ready
+NvTmRepCR1_{B2FE1952-0186-46C3-BAEC-A80A 15/08/2020 18.25.32    Ready
+NvTmRepCR2_{B2FE1952-0186-46C3-BAEC-A80A 15/08/2020 00.25.32    Ready
+NvTmRepCR3_{B2FE1952-0186-46C3-BAEC-A80A 15/08/2020 06.25.32    Ready
+NvTmRep_{B2FE1952-0186-46C3-BAEC-A80AA35 15/08/2020 12.25.32    Ready
+OneDrive Standalone Update Task-S-1-5-21 15/08/2020 06.48.07    Ready
+Opera scheduled assistant Autoupdate 158 15/08/2020 06.37.44    Ready
+Opera scheduled Autoupdate 1579403790    15/08/2020 21.48.56    Ready
+RtkAudUService64_BG                      N/A                    Running
+User_Feed_Synchronization-{A389EB65-2691 15/08/2020 03.15.56    Ready
+WpsUpdateTask_ASUS                       14/08/2020 22.41.51    Ready
+
+Folder: \Microsoft
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Office
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Office Automatic Updates 2.0             15/08/2020 03.17.47    Ready
+Office ClickToRun Service Monitor        15/08/2020 07.48.52    Ready
+Office Feature Updates                   15/08/2020 02.14.05    Ready
+Office Feature Updates Logon             N/A                    Ready
+Office Subscription Maintenance          15/08/2020 05.13.46    Ready
+OfficeTelemetryAgentFallBack2016         N/A                    Ready
+OfficeTelemetryAgentLogOn2016            N/A                    Ready
+
+Folder: \Microsoft\OneCore
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows\.NET Framework
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+.NET Framework NGEN v4.0.30319           N/A                    Ready
+.NET Framework NGEN v4.0.30319 64        N/A                    Ready
+.NET Framework NGEN v4.0.30319 64 Critic N/A                    Disabled
+.NET Framework NGEN v4.0.30319 Critical  N/A                    Disabled
+
+Folder: \Microsoft\Windows\Active Directory Rights Management Services Client
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+AD RMS Rights Policy Template Management N/A                    Disabled
+AD RMS Rights Policy Template Management N/A                    Ready
+
+Folder: \Microsoft\Windows\AppID
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+PolicyConverter                          N/A                    Disabled
+VerifiedPublisherCertStoreCheck          N/A                    Disabled
+
+Folder: \Microsoft\Windows\Application Experience
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Microsoft Compatibility Appraiser        15/08/2020 03.09.45    Ready
+ProgramDataUpdater                       N/A                    Ready
+StartupAppTask                           N/A                    Ready
+
+Folder: \Microsoft\Windows\ApplicationData
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+appuriverifierdaily                      N/A                    Ready
+appuriverifierinstall                    N/A                    Ready
+CleanupTemporaryState                    N/A                    Ready
+DsSvcCleanup                             N/A                    Ready
+
+Folder: \Microsoft\Windows\AppxDeploymentClient
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Pre-staged app cleanup                   N/A                    Disabled
+
+Folder: \Microsoft\Windows\Autochk
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Proxy                                    N/A                    Ready
+
+Folder: \Microsoft\Windows\BitLocker
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+BitLocker Encrypt All Drives             N/A                    Ready
+BitLocker MDM policy Refresh             N/A                    Ready
+
+Folder: \Microsoft\Windows\Bluetooth
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+UninstallDeviceTask                      N/A                    Ready
+
+Folder: \Microsoft\Windows\BrokerInfrastructure
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+BgTaskRegistrationMaintenanceTask        N/A                    Ready
+
+Folder: \Microsoft\Windows\CertificateServicesClient
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+UserTask                                 N/A                    Ready
+UserTask-Roam                            N/A                    Ready
+
+Folder: \Microsoft\Windows\Chkdsk
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ProactiveScan                            N/A                    Ready
+SyspartRepair                            N/A                    Ready
+
+Folder: \Microsoft\Windows\CloudExperienceHost
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+CreateObjectTask                         N/A                    Ready
+
+Folder: \Microsoft\Windows\CUAssistant
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+CULauncher                               14/08/2020 23.15.11    Ready
+
+Folder: \Microsoft\Windows\Customer Experience Improvement Program
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Consolidator                             15/08/2020 00.00.00    Ready
+UsbCeip                                  N/A                    Ready
+
+Folder: \Microsoft\Windows\Data Integrity Scan
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Data Integrity Scan                      01/09/2020 06.58.48    Ready
+Data Integrity Scan for Crash Recovery   N/A                    Ready
+
+Folder: \Microsoft\Windows\Defrag
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ScheduledDefrag                          N/A                    Ready
+
+Folder: \Microsoft\Windows\Device Information
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Device                                   15/08/2020 03.41.44    Ready
+
+Folder: \Microsoft\Windows\Diagnosis
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+RecommendedTroubleshootingScanner        N/A                    Ready
+Scheduled                                N/A                    Ready
+
+Folder: \Microsoft\Windows\DirectX
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+DirectXDatabaseUpdater                   N/A                    Ready
+DXGIAdapterCache                         N/A                    Ready
+
+Folder: \Microsoft\Windows\DiskCleanup
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SilentCleanup                            N/A                    Ready
+
+Folder: \Microsoft\Windows\DiskDiagnostic
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Microsoft-Windows-DiskDiagnosticDataColl N/A                    Disabled
+Microsoft-Windows-DiskDiagnosticResolver N/A                    Disabled
+
+Folder: \Microsoft\Windows\DiskFootprint
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Diagnostics                              N/A                    Ready
+StorageSense                             N/A                    Ready
+
+Folder: \Microsoft\Windows\DUSM
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+dusmtask                                 N/A                    Ready
+
+Folder: \Microsoft\Windows\EDP
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+EDP App Launch Task                      N/A                    Ready
+EDP Auth Task                            N/A                    Ready
+EDP Inaccessible Credentials Task        N/A                    Ready
+StorageCardEncryption Task               N/A                    Ready
+
+Folder: \Microsoft\Windows\ExploitGuard
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ExploitGuard MDM policy Refresh          N/A                    Ready
+
+Folder: \Microsoft\Windows\Feedback
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows\Feedback\Siuf
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+DmClient                                 N/A                    Ready
+DmClientOnScenarioDownload               N/A                    Ready
+
+Folder: \Microsoft\Windows\FileHistory
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+File History (maintenance mode)          N/A                    Ready
+
+Folder: \Microsoft\Windows\Flighting
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows\Flighting\FeatureConfig
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ReconcileFeatures                        N/A                    Ready
+
+Folder: \Microsoft\Windows\Flighting\OneSettings
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+RefreshCache                             15/08/2020 04.30.32    Ready
+
+Folder: \Microsoft\Windows\InstallService
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ScanForUpdates                           15/08/2020 14.00.00    Ready
+ScanForUpdatesAsUser                     N/A                    Ready
+WakeUpAndContinueUpdates                 N/A                    Disabled
+WakeUpAndScanForUpdates                  N/A                    Disabled
+
+Folder: \Microsoft\Windows\LanguageComponentsInstaller
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Installation                             N/A                    Ready
+ReconcileLanguageResources               N/A                    Ready
+
+Folder: \Microsoft\Windows\Live
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows\Location
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Notifications                            N/A                    Ready
+WindowsActionDialog                      N/A                    Ready
+
+Folder: \Microsoft\Windows\Maintenance
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+WinSAT                                   N/A                    Ready
+
+Folder: \Microsoft\Windows\Management
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows\Management\Provisioning
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Cellular                                 N/A                    Ready
+Logon                                    N/A                    Ready
+
+Folder: \Microsoft\Windows\Maps
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+MapsToastTask                            N/A                    Ready
+MapsUpdateTask                           N/A                    Disabled
+
+Folder: \Microsoft\Windows\MemoryDiagnostic
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ProcessMemoryDiagnosticEvents            N/A                    Ready
+RunFullMemoryDiagnostic                  N/A                    Ready
+
+Folder: \Microsoft\Windows\Mobile Broadband Accounts
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+MNO Metadata Parser                      N/A                    Ready
+
+Folder: \Microsoft\Windows\MUI
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+LPRemove                                 N/A                    Ready
+Mcbuilder                                N/A                    Ready
+
+Folder: \Microsoft\Windows\Multimedia
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SystemSoundsService                      N/A                    Running
+
+Folder: \Microsoft\Windows\NetTrace
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+GatherNetworkInfo                        N/A                    Ready
+
+Folder: \Microsoft\Windows\NlaSvc
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+WiFiTask                                 N/A                    Ready
+
+Folder: \Microsoft\Windows\PLA
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+INFO: There are no scheduled tasks presently available at your access level.
+
+Folder: \Microsoft\Windows\Plug and Play
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Device Install Group Policy              N/A                    Ready
+Device Install Reboot Required           N/A                    Ready
+Sysprep Generalize Drivers               N/A                    Ready
+
+Folder: \Microsoft\Windows\Power Efficiency Diagnostics
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+AnalyzeSystem                            N/A                    Ready
+
+Folder: \Microsoft\Windows\Printing
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+EduPrintProv                             N/A                    Ready
+
+Folder: \Microsoft\Windows\RecoveryEnvironment
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+VerifyWinRE                              N/A                    Disabled
+
+Folder: \Microsoft\Windows\Registry
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+RegIdleBackup                            N/A                    Ready
+
+Folder: \Microsoft\Windows\Servicing
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+StartComponentCleanup                    N/A                    Ready
+
+Folder: \Microsoft\Windows\SettingSync
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+BackgroundUploadTask                     N/A                    Ready
+NetworkStateChangeTask                   N/A                    Ready
+
+Folder: \Microsoft\Windows\SharedPC
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Account Cleanup                          N/A                    Disabled
+
+Folder: \Microsoft\Windows\Shell
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+CreateObjectTask                         N/A                    Ready
+FamilySafetyMonitor                      N/A                    Ready
+FamilySafetyMonitorToastTask             N/A                    Disabled
+FamilySafetyRefreshTask                  N/A                    Ready
+IndexerAutomaticMaintenance              N/A                    Ready
+
+Folder: \Microsoft\Windows\SoftwareProtectionPlatform
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SvcRestartTaskLogon                      N/A                    Disabled
+
+Folder: \Microsoft\Windows\SpacePort
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SpaceAgentTask                           N/A                    Ready
+SpaceManagerTask                         N/A                    Ready
+
+Folder: \Microsoft\Windows\Speech
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+HeadsetButtonPress                       N/A                    Ready
+
+Folder: \Microsoft\Windows\StateRepository
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+MaintenanceTasks                         N/A                    Ready
+
+Folder: \Microsoft\Windows\Storage Tiers Management
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Storage Tiers Management Initialization  N/A                    Ready
+Storage Tiers Optimization               N/A                    Disabled
+
+Folder: \Microsoft\Windows\Subscription
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+EnableLicenseAcquisition                 N/A                    Ready
+LicenseAcquisition                       N/A                    Disabled
+
+Folder: \Microsoft\Windows\Sysmain
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+HybridDriveCachePrepopulate              N/A                    Disabled
+HybridDriveCacheRebalance                N/A                    Disabled
+ResPriStaticDbSync                       N/A                    Ready
+WsSwapAssessmentTask                     N/A                    Ready
+
+Folder: \Microsoft\Windows\SystemRestore
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SR                                       N/A                    Ready
+
+Folder: \Microsoft\Windows\Task Manager
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Interactive                              N/A                    Ready
+
+Folder: \Microsoft\Windows\TextServicesFramework
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+MsCtfMonitor                             N/A                    Ready
+
+Folder: \Microsoft\Windows\Time Synchronization
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ForceSynchronizeTime                     N/A                    Ready
+SynchronizeTime                          N/A                    Ready
+
+Folder: \Microsoft\Windows\Time Zone
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+SynchronizeTimeZone                      N/A                    Ready
+
+Folder: \Microsoft\Windows\UNP
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+RunUpdateNotificationMgr                 15/08/2020 14.16.12    Ready
+
+Folder: \Microsoft\Windows\UPnP
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+UPnPHostConfig                           N/A                    Ready
+
+Folder: \Microsoft\Windows\USB
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Usb-Notifications                        N/A                    Ready
+
+Folder: \Microsoft\Windows\WCM
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+WiFiTask                                 N/A                    Ready
+
+Folder: \Microsoft\Windows\WDI
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+ResolutionHost                           N/A                    Ready
+
+Folder: \Microsoft\Windows\Windows Defender
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Windows Defender Cache Maintenance       N/A                    Ready
+Windows Defender Cleanup                 N/A                    Ready
+Windows Defender Scheduled Scan          N/A                    Ready
+Windows Defender Verification            N/A                    Ready
+
+Folder: \Microsoft\Windows\Windows Error Reporting
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+QueueReporting                           14/08/2020 23.16.02    Ready
+
+Folder: \Microsoft\Windows\Windows Filtering Platform
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+BfeOnServiceStartTypeChange              N/A                    Ready
+
+Folder: \Microsoft\Windows\Windows Media Sharing
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+UpdateLibrary                            N/A                    Ready
+
+Folder: \Microsoft\Windows\WindowsColorSystem
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Calibration Loader                       N/A                    Ready
+
+Folder: \Microsoft\Windows\WindowsUpdate
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Scheduled Start                          14/08/2020 22.47.00    Ready
+
+Folder: \Microsoft\Windows\Wininet
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+CacheTask                                N/A                    Running
+
+Folder: \Microsoft\Windows\WlanSvc
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+CDSSync                                  N/A                    Ready
+
+Folder: \Microsoft\Windows\Work Folders
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Work Folders Logon Synchronization       N/A                    Ready
+Work Folders Maintenance Work            N/A                    Ready
+
+Folder: \Microsoft\Windows\Workplace Join
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Automatic-Device-Join                    N/A                    Disabled
+Device-Sync                              N/A                    Disabled
+Recovery-Check                           N/A                    Disabled
+
+Folder: \Microsoft\Windows\WwanSvc
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+NotificationTask                         N/A                    Ready
+
+Folder: \Microsoft\XblGameSave
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+XblGameSaveTask                          N/A                    Ready
+
+Folder: \Mozilla
+TaskName                                 Next Run Time          Status
+======================================== ====================== ===============
+Firefox Default Browser Agent 308046B0AF 15/08/2020 16.26.28    Ready
+
+7. bcdboot.exe
+C:\Users\ASUS>bcdboot.exe
+
+Bcdboot - Bcd boot file creation and repair tool.
+
+The bcdboot.exe command-line tool is used to copy critical boot files to the
+system partition and to create a new system BCD store.
+
+bcdboot <source> [/l <locale>] [/s <volume-letter> [/f <firmware>]] [/v]
+                 [/m [{OS Loader ID}]] [/addlast] [/p] [/c]
+
+  source     Specifies the location of the windows system root.
+
+  /l         Specifies an optional locale parameter to use when
+             initializing the BCD store. The default is US English.
+
+  /s         Specifies an optional volume letter parameter to designate
+             the target system partition where boot environment files are
+             copied.  The default is the system partition identified by
+             the firmware.
+
+  /v         Enables verbose mode.
+
+  /m         If an OS loader GUID is provided, this option merges the
+             given loader object with the system template to produce a
+             bootable entry. Otherwise, only global objects are merged.
+
+  /d         Specifies that the existing default windows boot entry
+             should be preserved.
+
+  /f         Used with the /s command, specifies the firmware type of the
+             target system partition. Options for <firmware> are 'UEFI',
+             'BIOS', or 'ALL'.
+
+  /addlast   Specifies that the windows boot manager firmware entry
+             should be added last. The default behavior is to add it
+             first.
+
+  /bcdclean  Clean the BCD Store. By default, simply removes any duplicate
+             entries in the BCD. Can be followed by 'full'. In this case,
+             each entry is scanned. If the corresponding device for that entry
+             does not exist, the entry is deleted.
+
+  /p         Specifies that the windows boot manager firmware entry
+             position should be preserved. If entry does not exist,
+             new entry will be added in the first position.
+
+  /c         Specifies that any existing objects described by the template
+             should not be migrated.
+
+Examples: bcdboot c:\windows /l en-us
+          bcdboot c:\windows /s h:
+          bcdboot c:\windows /s h: /f UEFI
+          bcdboot c:\windows /m {d58d10c6-df53-11dc-878f-00064f4f4e08}
+          bcdboot c:\windows /d /addlast
+          bcdboot c:\windows /p
+
+8. bootcfg
+C:\Users\ASUS>bootcfg /copy /?
+
+BOOTCFG /Copy [/S system [/U user [/P [password]]]]
+            [/D description] /ID bootid
+
+Description:
+    Makes a copy of an existing boot entry.
+
+Parameter List:
+    /S     system            Specifies the remote system to connect to.
+
+    /U     [domain\]user     Specifies the user context under which
+                             the command should execute.
+
+    /P     [password]        Specifies the password for the given
+                             user context. Prompts for input if omitted.
+
+    /D     description       The description of the OS entry being made.
+
+    /ID    bootid            Specifies the boot entry id to be copied
+                             in the [operating systems] section of the
+                             BOOT.INI file.
+
+    /?                       Displays this help message.
+
+Examples:
+    BOOTCFG /Copy /D "Windows with Debug" /ID 1
+    BOOTCFG /Copy /S system /U user /D "Windows" /ID 3
+    BOOTCFG /Copy /D "Windows /Crashdebug" /ID 2
+
+9. Icacls
+C:\Users\ASUS>Icacls
+
+ICACLS name /save aclfile [/T] [/C] [/L] [/Q]
+    stores the DACLs for the files and folders that match the name
+    into aclfile for later use with /restore. Note that SACLs,
+    owner, or integrity labels are not saved.
+
+ICACLS directory [/substitute SidOld SidNew [...]] /restore aclfile
+                 [/C] [/L] [/Q]
+    applies the stored DACLs to files in directory.
+
+ICACLS name /setowner user [/T] [/C] [/L] [/Q]
+    changes the owner of all matching names. This option does not
+    force a change of ownership; use the takeown.exe utility for
+    that purpose.
+
+ICACLS name /findsid Sid [/T] [/C] [/L] [/Q]
+    finds all matching names that contain an ACL
+    explicitly mentioning Sid.
+
+ICACLS name /verify [/T] [/C] [/L] [/Q]
+    finds all files whose ACL is not in canonical form or whose
+    lengths are inconsistent with ACE counts.
+
+ICACLS name /reset [/T] [/C] [/L] [/Q]
+    replaces ACLs with default inherited ACLs for all matching files.
+
+ICACLS name [/grant[:r] Sid:perm[...]]
+       [/deny Sid:perm [...]]
+       [/remove[:g|:d]] Sid[...]] [/T] [/C] [/L] [/Q]
+       [/setintegritylevel Level:policy[...]]
+
+    /grant[:r] Sid:perm grants the specified user access rights. With :r,
+        the permissions replace any previously granted explicit permissions.
+        Without :r, the permissions are added to any previously granted
+        explicit permissions.
+
+    /deny Sid:perm explicitly denies the specified user access rights.
+        An explicit deny ACE is added for the stated permissions and
+        the same permissions in any explicit grant are removed.
+
+    /remove[:[g|d]] Sid removes all occurrences of Sid in the ACL. With
+        :g, it removes all occurrences of granted rights to that Sid. With
+        :d, it removes all occurrences of denied rights to that Sid.
+
+    /setintegritylevel [(CI)(OI)]Level explicitly adds an integrity
+        ACE to all matching files.  The level is to be specified as one
+        of:
+            L[ow]
+            M[edium]
+            H[igh]
+        Inheritance options for the integrity ACE may precede the level
+        and are applied only to directories.
+
+    /inheritance:e|d|r
+        e - enables inheritance
+        d - disables inheritance and copy the ACEs
+        r - remove all inherited ACEs
+
+
+Note:
+    Sids may be in either numerical or friendly name form. If a numerical
+    form is given, affix a * to the start of the SID.
+
+    /T indicates that this operation is performed on all matching
+        files/directories below the directories specified in the name.
+
+    /C indicates that this operation will continue on all file errors.
+        Error messages will still be displayed.
+
+    /L indicates that this operation is performed on a symbolic link
+       itself versus its target.
+
+    /Q indicates that icacls should suppress success messages.
+
+    ICACLS preserves the canonical ordering of ACE entries:
+            Explicit denials
+            Explicit grants
+            Inherited denials
+            Inherited grants
+
+    perm is a permission mask and can be specified in one of two forms:
+        a sequence of simple rights:
+                N - no access
+                F - full access
+                M - modify access
+                RX - read and execute access
+                R - read-only access
+                W - write-only access
+                D - delete access
+        a comma-separated list in parentheses of specific rights:
+                DE - delete
+                RC - read control
+                WDAC - write DAC
+                WO - write owner
+                S - synchronize
+                AS - access system security
+                MA - maximum allowed
+                GR - generic read
+                GW - generic write
+                GE - generic execute
+                GA - generic all
+                RD - read data/list directory
+                WD - write data/add file
+                AD - append data/add subdirectory
+                REA - read extended attributes
+                WEA - write extended attributes
+                X - execute/traverse
+                DC - delete child
+                RA - read attributes
+                WA - write attributes
+        inheritance rights may precede either form and are applied
+        only to directories:
+                (OI) - object inherit
+                (CI) - container inherit
+                (IO) - inherit only
+                (NP) - don't propagate inherit
+                (I) - permission inherited from parent container
+
+Examples:
+
+        icacls c:\windows\* /save AclFile /T
+        - Will save the ACLs for all files under c:\windows
+          and its subdirectories to AclFile.
+
+        icacls c:\windows\ /restore AclFile
+        - Will restore the Acls for every file within
+          AclFile that exists in c:\windows and its subdirectories.
+
+        icacls file /grant Administrator:(D,WDAC)
+        - Will grant the user Administrator Delete and Write DAC
+          permissions to file.
+
+        icacls file /grant *S-1-1-0:(D,WDAC)
+        - Will grant the user defined by sid S-1-1-0 Delete and
+          Write DAC permissions to file.
+
+10. chcp
+C:\Users\ASUS>chcp
+Active code page: 437
+
+11. chkdsk
+C:\Users\ASUS>chkdsk
+Access Denied as you do not have sufficient privileges or
+the disk may be locked by another process.
+You have to invoke this utility running in elevated mode
+and make sure the disk is unlocked.
+
+12. compact
+C:\Users\ASUS>compact /c
+
+ Setting the directory C:\Users\ASUS\ to compress new files [OK]
+
+ Compressing files in C:\Users\ASUS\
+
+.android                    0 :         0 = 1,0 to 1 [OK]
+.borland                    0 :         0 = 1,0 to 1 [OK]
+.Mendeley Desktop           0 :         0 = 1,0 to 1 [OK]
+.Origin                     0 :         0 = 1,0 to 1 [OK]
+.pencil                     0 :         0 = 1,0 to 1 [OK]
+.php_history              139 :       139 = 1,0 to 1 [OK]
+.QtWebEngineProcess         0 :         0 = 1,0 to 1 [OK]
+.VirtualBox                 0 :         0 = 1,0 to 1 [OK]
+.vscode                     0 :         0 = 1,0 to 1 [OK]
+3D Objects                  0 :         0 = 1,0 to 1 [OK]
+ansel                       0 :         0 = 1,0 to 1 [OK]
+Application Data: Access is denied.
+
+13 files within 2 directories were compressed.
+139 total bytes of data are stored in 139 bytes.
+The compression ratio is 1,0 to 1.
+
+13. date
+C:\Users\ASUS>date
+The current date is: 15/08/2020
+Enter the new date: (dd-mm-yy) 15/08/2020
+A required privilege is not held by the client.
+
+14. expand
+C:\Users\ASUS>expand
+Microsoft (R) File Expansion Utility
+Copyright (c) Microsoft Corporation. All rights reserved.
+
+No files specified.
+
+15. hostname
+C:\Users\ASUS>hostname
+LAPTOP-U9I6D586
+
+16. ipconfig
+C:\Users\ASUS>ipconfig
+
+Windows IP Configuration
+
+
+Ethernet adapter Ethernet:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+
+Ethernet adapter VirtualBox Host-Only Network:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::94e9:31d0:cb0c:b77e%4
+   IPv4 Address. . . . . . . . . . . : 192.168.56.1
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . :
+
+Wireless LAN adapter Local Area Connection* 1:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+
+Wireless LAN adapter Local Area Connection* 4:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . :
+
+Wireless LAN adapter Wi-Fi:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::ecc0:b0b9:e6c6:739e%12
+   IPv4 Address. . . . . . . . . . . : 10.202.210.182
+   Subnet Mask . . . . . . . . . . . : 255.255.0.0
+   Default Gateway . . . . . . . . . : 10.202.0.1
+
+18. klist
+C:\Users\ASUS>klist
+
+Current LogonId is 0:0x464fa
+
+Cached Tickets: (0)
+
+19. ksetup
+C:\Users\ASUS>ksetup
+Machine is not configured to log on to an external KDC.  Probably a workgroup member
+Failed to create Kerberos key: 5 (0x5)
+
+20. mode
+C:\Users\ASUS>mode
+
+Status for device CON:
+----------------------
+    Lines:          9001
+    Columns:        120
+    Keyboard rate:  31
+    Keyboard delay: 1
+    Code page:      437
+
