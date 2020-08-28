@@ -1,5 +1,3 @@
-import java.io.*;
-
 public class Employee {
 
     private String name;
