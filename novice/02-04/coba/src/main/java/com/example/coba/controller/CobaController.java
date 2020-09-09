@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import java.validation.Valid;
-
 import com.example.model.Coba;
 import com.example.exception.ResourceNotFoundException;
 import com.example.repository.CobaRepository;
@@ -24,17 +22,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController 
-@RequestMapping(path="/coba") 
+@RequestMapping(path="/api/v1") 
 public class CobaController {
   @Autowired 
   private CobaRepository cobaRepository;
 
-  @GetMapping(path="/all")
+  @GetMapping(path="/users")
   public @ResponseBody Iterable<Coba> getAllCobas() {
     return cobaRepository.findAll();
   }
 
-  @GetMapping(path="/coba/{id}")
+  @GetMapping(path="/users/{id}")
   public ResponseEntity<Coba> getCobaById(@PathVariable(value = "id") Long cobaId)
   throws ResourceNotFoundException {
     Coba coba = cobaRepository.findById(cobaId)
@@ -42,14 +40,14 @@ public class CobaController {
     return ResponseEntity.ok().body(coba);
 }
 
-  @PostMapping(path="/cobas") // Map ONLY POST Requests
-  public Coba createCoba(@Valid @RequestBody Coba coba) {
+  @PostMapping(path="/users")
+  public Coba createCoba( @RequestBody Coba coba) {
     return cobaRepository.save(coba);
   }
 
-  @PutMapping(path="/cobas/{id}")
+  @PutMapping(path="/users/{id}")
   public ResponseEntity<Coba> updateCoba(@PathVariable(value = "id") Long cobaId,
-         @Valid @RequestBody Coba cobaDetails) throws ResourceNotFoundException {
+         @RequestBody Coba cobaDetails) throws ResourceNotFoundException {
         Coba coba = cobaRepository.findById(cobaId)
         .orElseThrow(() -> new ResourceNotFoundException("Coba not found for this id :: " + cobaId));
 
@@ -59,7 +57,7 @@ public class CobaController {
         return ResponseEntity.ok(updatedCoba);
     }
 
-    @DeleteMapping(path="/cobas/{id}")
+    @DeleteMapping(path="/users/{id}")
     public Map<String, Boolean> deleteCoba(@PathVariable(value = "id") Long cobaId)
          throws ResourceNotFoundException {
         Coba coba = cobaRepository.findById(cobaId)

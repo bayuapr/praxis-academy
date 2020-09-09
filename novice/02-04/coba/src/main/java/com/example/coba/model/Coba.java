@@ -7,7 +7,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity // This tells Hibernate to make a table out of this class
-@Table(name="cobas")
+@Table(name="users")
 public class Coba {
   @Id
   @GeneratedValue(strategy=GenerationType.AUTO)
